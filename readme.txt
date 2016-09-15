@@ -1,0 +1,37 @@
+This sample shows how to remote lookup a Stateless Session Bean in Jboss8
+(Assume clint is in a differnet IP-192.168.125.9)
+
+1. jboss-ejb-client.properties:
+
+   java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
+   java.naming.provider.url=http-remoting://192.168.12.2:8080
+   jboss.naming.client.ejb.context=true
+   java.naming.security.principal=app1
+   java.naming.security.credentials=pass123!
+
+2. JBOSS wildfly-8 (IP is 192.168.12.2)
+   Deploy jar to JBoss8
+   HelloWorldSessionBean-0.0.1-SNAPSHOT.jar
+   
+3. Create App User in JBoss
+   User: app1
+   Password: pass123!
+
+4. In Wildfly, for remote access to EJBs, use the ejb: namespace with the following syntax:
+
+   For stateless beans:
+      ejb:<app-name>/<module-name>/<distinct-name>/<bean-name>!<fully-qualified-classname-of-the-remote-interface>
+
+   For stateful beans:
+      ejb:<app-name(Ear)>/<module-name(Jar)>/<distinct-name>/<bean-name(Concert)>!<fully-qualified-classname-of-the-remote-interface(fullpath of remote interface)>?stateful
+
+5. Home interface and remote interface:
+   5.1. Home interface:
+        (1). Client is in same JVM
+        (2). Direct method call(Not RMI)
+        (3). Parameter pass by reference
+
+   5.2. Remote interface:
+        (1). Client is in different JVM
+        (2). Remote component interface will be handled via remote method invocation (RMI)
+        (3). Parameter pass by value   

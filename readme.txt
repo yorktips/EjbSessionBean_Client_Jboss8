@@ -3,12 +3,27 @@ This sample shows how to remote lookup a Stateless Session Bean in jboss-5.1.0.G
 
 1. jboss-ejb-client.properties:
 
+   #wildfly-8
    java.naming.factory.initial=org.jboss.naming.remote.client.InitialContextFactory
    java.naming.provider.url=http-remoting://192.168.12.2:8080
    jboss.naming.client.ejb.context=true
    java.naming.security.principal=app1
    java.naming.security.credentials=pass123!
 
+	#JBOSS
+   java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory
+   java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces
+   java.naming.provider.url=localhost
+
+	#Weblogic
+    weblogic.jndi.Environment environment = new weblogic.jndi.Environment();
+    environment.setInitialContextFactory(
+    weblogic.jndi.Environment.DEFAULT_INITIAL_CONTEXT_FACTORY);
+    environment.setProviderURL("t3://bross:4441");
+    environment.setSecurityPrincipal("guest");
+    environment.setSecurityCrendentials("guest");
+    InitialContext ctx = environment.getInitialContext();
+         
 2. jboss-5.1.0.GA (IP is 192.168.12.2)
    Deploy jar to JBoss8
    HelloWorldSessionBean-0.0.1-SNAPSHOT.jar

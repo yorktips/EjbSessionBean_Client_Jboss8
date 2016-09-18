@@ -11,14 +11,14 @@ public class Client {
 	public static void main(String[] args) {
 		EmployeeRemote remote = doLookup();
 		Employee employee = new Employee();
-		employee.setFirstName("Mukesh");
-		employee.setLastName("Kumar");
-		employee.setEmail("mrajnitro@gmail.com");
+		employee.setFirstName("Mark");
+		employee.setLastName("King");
+		employee.setEmail("mking@gmail.com");
 
 		Employee employee1 = new Employee();
-		employee1.setFirstName("Ravi");
-		employee1.setLastName("Raj");
-		employee1.setEmail("ravi@gmail.com");
+		employee1.setFirstName("Mathew");
+		employee1.setLastName("king");
+		employee1.setEmail("mtking@gmail.com");
 		remote.addEmployee(employee);
 		remote.addEmployee(employee1);
 	}

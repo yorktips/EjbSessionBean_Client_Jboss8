@@ -1,4 +1,4 @@
-This sample shows how to remote lookup a Stateless Session Bean in Jboss8
+This sample shows how to remote lookup a Stateless Session Bean in jboss-5.1.0.GA
 (Assume clint is in a differnet IP-192.168.125.9)
 
 1. jboss-ejb-client.properties:
@@ -9,7 +9,7 @@ This sample shows how to remote lookup a Stateless Session Bean in Jboss8
    java.naming.security.principal=app1
    java.naming.security.credentials=pass123!
 
-2. JBOSS wildfly-8 (IP is 192.168.12.2)
+2. jboss-5.1.0.GA (IP is 192.168.12.2)
    Deploy jar to JBoss8
    HelloWorldSessionBean-0.0.1-SNAPSHOT.jar
    
@@ -17,7 +17,7 @@ This sample shows how to remote lookup a Stateless Session Bean in Jboss8
    User: app1
    Password: pass123!
 
-4. In Wildfly, for remote access to EJBs, use the ejb: namespace with the following syntax:
+4. jboss-5.1.0.GA, for remote access to EJBs, use the ejb: namespace with the following syntax:
 
    For stateless beans:
       ejb:<app-name>/<module-name>/<distinct-name>/<bean-name>!<fully-qualified-classname-of-the-remote-interface>

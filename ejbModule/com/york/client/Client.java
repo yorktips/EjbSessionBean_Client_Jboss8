@@ -42,6 +42,7 @@ public class Client {
 	 *  * location of JBoss JNDI Service provider the client will use. It should
 	 * be * URL string.
 	 */
+	//private static final String PROVIDER_URL = "http-remoting://localhost:8080";
 	private static final String PROVIDER_URL = "jnp://localhost:1099";
 	/*
 	 *  * specifying the list of package prefixes to use when loading in URL *

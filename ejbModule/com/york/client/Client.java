@@ -6,10 +6,39 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import com.york.businesslogic.*;
 import com.york.entity.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.List;
+import java.util.Properties;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueSender;
+import javax.jms.QueueSession;
 
 public class Client {
 	public static void main(String[] args) {
-		EmployeeRemote remote = doLookup();
+		TestManageEmployeeBean.testManageEmployeeBean();
+
+		MDBTester jmsTester = new MDBTester();
+		jmsTester.testMessageBeanEjb();
+	}
+}
+
+class TestManageEmployeeBean {
+	public static void main(String[] args) {
+		testManageEmployeeBean();
+
+		MDBTester jmsTester = new MDBTester();
+		jmsTester.testMessageBeanEjb();
+		
+	}
+	
+	public static void testManageEmployeeBean() {
+		EmployeeRemote remote = doLookupManageEmployeeBean();
 		Employee employee = new Employee();
 		employee.setFirstName("Mark");
 		employee.setLastName("King");
@@ -23,7 +52,7 @@ public class Client {
 		remote.addEmployee(employee1);
 	}
 
-	private static EmployeeRemote doLookup() {
+	private static EmployeeRemote doLookupManageEmployeeBean() {
 		Context context = null;
 		EmployeeRemote bean = null;
 		try {
@@ -48,6 +77,7 @@ public class Client {
 	 *  * specifying the list of package prefixes to use when loading in URL *
 	 * context factories. colon separated
 	 */
+
 	private static final String JNP_INTERFACES = "org.jboss.naming:org.jnp.interfaces";
 	/*
 	 *  * Factory that creates initial context objects. fully qualified class
@@ -69,3 +99,95 @@ public class Client {
 	}
 }
 
+
+
+class MDBTester {
+
+	BufferedReader brConsoleReader = null;
+	Properties props;
+	InitialContext ctx;
+	{
+		props = new Properties();
+		try {
+			props.load(new FileInputStream("jndi.properties"));
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+		try {
+			ctx = new InitialContext(props);
+		} catch (NamingException ex) {
+			ex.printStackTrace();
+		}
+		brConsoleReader = new BufferedReader(new InputStreamReader(System.in));
+	}
+/*
+	public static void main(String[] args) {
+
+		MDBTester jmsTester = new MDBTester();
+
+		jmsTester.testMessageBeanEjb();
+	}
+*/
+	
+	private void showGUI() {
+		System.out.println("**********************");
+		System.out.println("Welcome to Book Store");
+		System.out.println("**********************");
+		System.out.print("Options \n1. Add Book\n2. Exit \nEnter Choice: ");
+	}
+
+	public void testMessageBeanEjb() {
+
+		try {
+			int choice = 1;
+			Queue queue = (Queue) ctx.lookup("/queue/BookQueue");
+			QueueConnectionFactory factory = (QueueConnectionFactory) ctx
+					.lookup("ConnectionFactory");
+			QueueConnection connection = factory.createQueueConnection();
+			QueueSession session = connection.createQueueSession(false,
+					QueueSession.CLIENT_ACKNOWLEDGE);
+			QueueSender sender = session.createSender(queue);
+
+			while (choice != 2) {
+				String bookName;
+				showGUI();
+				String strChoice = brConsoleReader.readLine();
+				choice = Integer.parseInt(strChoice);
+				if (choice == 1) {
+					System.out.print("Enter book name: ");
+					bookName = brConsoleReader.readLine();
+					Book book = new Book();
+					book.setName(bookName);
+					ObjectMessage objectMessage = session
+							.createObjectMessage(book);
+					sender.send(objectMessage);
+				} else if (choice == 2) {
+					break;
+				}
+			}
+
+			LibraryPersistentBeanRemote libraryBean = (LibraryPersistentBeanRemote) ctx
+					.lookup("LibraryPersistentBean/remote");
+
+			List<Book> booksList = libraryBean.getBooks();
+
+			System.out.println("Book(s) entered so far: " + booksList.size());
+			int i = 0;
+			for (Book book : booksList) {
+				System.out.println((i + 1) + ". " + book.getName());
+				i++;
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			try {
+				if (brConsoleReader != null) {
+					brConsoleReader.close();
+				}
+			} catch (IOException ex) {
+				System.out.println(ex.getMessage());
+			}
+		}
+	}
+}
